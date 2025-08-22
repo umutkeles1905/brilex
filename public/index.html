@@ -2,77 +2,1164 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1024, height=600">
-    <title>BriLeX Dental Furnace</title>
+    <meta name="viewport" content="width=1024, height=600, user-scalable=no">
+    <title>BriLeX Dental Furnace Pro</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: white;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 1;
+            transition: opacity 2s ease-out;
+        }
+
+        .splash-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            text-align: center;
+            animation: fadeInScale 2s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .splash-logo {
+            font-size: 80px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5, #00d2ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .splash-subtitle {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+
+        .splash-loader {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .splash-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border-radius: 2px;
+            animation: loading 3s ease-out forwards;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            height: 60px;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4757;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.running {
+            background: #2ed573;
+        }
+
+        .status-dot.paused {
+            background: #ffa502;
+        }
+
+        .status-dot.error {
+            background: #ff3742;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .timer {
+            font-size: 32px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            min-width: 160px;
+            text-align: center;
+            border: 2px solid rgba(76, 175, 254, 0.3);
+        }
+
+        /* Main Application */
+        .main-app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-app.show {
+            display: flex;
+        }
+
+        .container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+        }
+
+        /* Graph Section */
+        .graph-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .graph-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            height: 280px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .graph-container::before {
+            content: "BriLeX";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            font-weight: bold;
+            opacity: 0.05;
+            letter-spacing: 10px;
+            pointer-events: none;
+        }
+
+        .graph-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #temperatureChart {
+            width: 100%;
+            height: 240px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Temperature Cards */
+        .temp-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .temp-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             padding: 20px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
-        .container {
-            max-width: 800px;
+
+        .temp-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .temp-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .temp-card:hover::before {
+            left: 100%;
+        }
+
+        .temp-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .temp-value {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .temp-unit {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .power-indicator {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+        }
+
+        .power-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .power-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .program-info {
+            background: rgba(76, 175, 254, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(76, 175, 254, 0.3);
+        }
+
+        .program-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 12px;
+        }
+
+        .program-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .progress-section {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .progress-bar-main {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill-main {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        /* Control Buttons */
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            margin-top: 100px;
         }
-        h1 { font-size: 48px; margin-bottom: 20px; }
-        .status { font-size: 24px; margin: 20px 0; }
-        .temp { font-size: 64px; color: #4facfe; margin: 30px 0; }
-        button {
-            padding: 20px 40px;
-            font-size: 24px;
+
+        .control-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        .control-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-start {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px;
         }
-        button:hover { transform: scale(1.05); }
+
+        .btn-pause {
+            background: linear-gradient(135deg, #ffa502, #ff6348);
+            color: white;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-emergency {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+        }
+
+        .btn-program {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Running state animation */
+        .running .status-card {
+            animation: glow 3s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(76, 175, 254, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(76, 175, 254, 0.6); }
+        }
+
+        /* Error display */
+        .error-panel {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-panel.show {
+            display: block;
+        }
+
+        .error-title {
+            font-weight: bold;
+            color: #ff4757;
+            margin-bottom: 10px;
+        }
+
+        .error-list {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 2000;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #2ed573, #17a2b8);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+        }
+
+        .toast.warning {
+            background: linear-gradient(135deg, #ffa502, #ff6348);
+        }
+
+        /* Connection status */
+        .connection-status {
+            font-size: 12px;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4757;
+        }
+
+        .connection-dot.connected {
+            background: #2ed573;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🦷 BriLeX Dental Furnace</h1>
-        <div class="status">Sistem Durumu: <span id="status">Hazır</span></div>
-        <div class="temp" id="temperature">25°C</div>
-        
-        <button onclick="startProgram()">▶ BAŞLAT</button>
-        <button onclick="stopProgram()">⏹ DURDUR</button>
-        <button onclick="testSystem()">🔧 TEST</button>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <div class="splash-logo">BriLeX</div>
+            <div class="splash-subtitle">DENTAL FURNACE PRO</div>
+            <div class="splash-loader">
+                <div class="splash-progress"></div>
+            </div>
+        </div>
     </div>
 
+    <!-- Main Application -->
+    <div class="main-app" id="mainApp">
+        <div class="header">
+            <div class="brand">🦷 BriLeX DentalFurnace Pro</div>
+            <div class="header-info">
+                <div class="connection-status">
+                    <div class="connection-dot" id="connectionDot"></div>
+                    <span id="connectionStatus">Bağlanıyor...</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">HAZIR</span>
+                </div>
+                <div class="timer" id="timer">00:00:00</div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="graph-section">
+                <div class="graph-container">
+                    <div class="graph-title">📈 Sıcaklık Grafiği</div>
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+                
+                <div class="temp-cards">
+                    <div class="temp-card">
+                        <div class="temp-label">Mevcut Sıcaklık</div>
+                        <div class="temp-value" id="currentTemp">25.0</div>
+                        <div class="temp-unit">°C</div>
+                    </div>
+                    
+                    <div class="temp-card">
+                        <div class="temp-label">Hedef Sıcaklık</div>
+                        <div class="temp-value" id="targetTemp">0</div>
+                        <div class="temp-unit">°C</div>
+                    </div>
+                    
+                    <div class="temp-card">
+                        <div class="temp-label">Termokupl 1</div>
+                        <div class="temp-value" id="temp1">25.0</div>
+                        <div class="temp-unit">°C</div>
+                    </div>
+                    
+                    <div class="temp-card">
+                        <div class="temp-label">Termokupl 2</div>
+                        <div class="temp-value" id="temp2">25.0</div>
+                        <div class="temp-unit">°C</div>
+                        <div class="power-indicator">
+                            <div style="display:flex;justify-content:space-between;align-items:center">
+                                <span>GÜÇÇ</span>
+                                <span id="powerText">0%</span>
+                            </div>
+                            <div class="power-bar">
+                                <div class="power-fill" id="powerFill" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="status-card">
+                    <div class="status-title">
+                        🎯 Program Bilgileri
+                    </div>
+                    
+                    <div class="program-info">
+                        <div class="program-name" id="programName">IPS e.max CAD</div>
+                        <div class="program-details">
+                            <div class="detail-item">
+                                <span>🌡️</span>
+                                <span id="progTemp">850°C</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>⏱️</span>
+                                <span id="progTime">25 dk</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>🔽</span>
+                                <span id="progVacuum">-95 kPa</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>⚡</span>
+                                <span id="progPower">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>Program İlerlemesi</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress-bar-main">
+                            <div class="progress-fill-main" id="progressFill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Error Panel -->
+                    <div class="error-panel" id="errorPanel">
+                        <div class="error-title">⚠️ Sistem Uyarıları</div>
+                        <div class="error-list" id="errorList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-buttons">
+                <button class="control-btn btn-start" id="startBtn" onclick="startProgram()">
+                    ▶ BAŞLAT
+                </button>
+                <button class="control-btn btn-pause" id="pauseBtn" onclick="pauseProgram()">
+                    ⏸ DURAKLAT
+                </button>
+                <button class="control-btn btn-stop" id="stopBtn" onclick="stopProgram()">
+                    ⏹ DURDUR
+                </button>
+                <button class="control-btn btn-emergency" id="emergencyBtn" onclick="emergencyStop()">
+                    🚨 ACİL STOP
+                </button>
+                <button class="control-btn btn-program" onclick="showToast('📋 Program seçimi yakında geliyor!', 'info')">
+                    📋 PROGRAMLAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        async function testSystem() {
+        // Global Variables
+        let ws = null;
+        let reconnectInterval = null;
+        let temperatureData = [];
+        let targetData = [];
+        let timeLabels = [];
+        
+        let systemState = {
+            isRunning: false,
+            isPaused: false,
+            elapsedTime: 0,
+            currentProgram: 1,
+            temperatures: { current: 25, target: 0, tc1: 25, tc2: 25 },
+            heaterPower: 0,
+            vacuum: 0,
+            fan: false,
+            doorOpen: false,
+            emergency: false,
+            errors: []
+        };
+
+        // Chart setup
+        const canvas = document.getElementById('temperatureChart');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth - 40;
+            canvas.height = 240;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initialize app after splash
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splashScreen').classList.add('hide');
+                document.getElementById('mainApp').classList.add('show');
+                initializeApp();
+            }, 3000);
+        });
+
+        function initializeApp() {
+            resizeCanvas();
+            connectWebSocket();
+            updateDisplay();
+            
+            // Initialize with some sample data
+            for(let i = 0; i < 50; i++) {
+                temperatureData.push(25 + Math.random() * 2);
+                targetData.push(0);
+                timeLabels.push(new Date(Date.now() - (50-i) * 1000));
+            }
+            
+            drawChart();
+            console.log('🚀 BriLeX Gelişmiş Arayüz Hazır!');
+        }
+
+        // WebSocket connection
+        function connectWebSocket() {
             try {
-                const response = await fetch('/api/status');
-                const data = await response.json();
-                document.getElementById('status').textContent = data.message;
-                document.getElementById('temperature').textContent = data.temperature + '°C';
-                alert('✅ Sistem testi başarılı!');
+                ws = new WebSocket('ws://localhost:3001');
+                
+                ws.onopen = function() {
+                    console.log('📡 WebSocket bağlandı');
+                    updateConnectionStatus(true);
+                    
+                    if (reconnectInterval) {
+                        clearInterval(reconnectInterval);
+                        reconnectInterval = null;
+                    }
+                };
+                
+                ws.onmessage = function(event) {
+                    try {
+                        const message = JSON.parse(event.data);
+                        if (message.type === 'status') {
+                            systemState = { ...systemState, ...message.data };
+                            updateDisplayFromBackend();
+                        }
+                    } catch (error) {
+                        console.error('WebSocket mesaj hatası:', error);
+                    }
+                };
+                
+                ws.onclose = function() {
+                    console.log('📡 WebSocket bağlantısı kesildi');
+                    updateConnectionStatus(false);
+                    
+                    // Otomatik yeniden bağlanma
+                    if (!reconnectInterval) {
+                        reconnectInterval = setInterval(() => {
+                            console.log('🔄 Yeniden bağlanıyor...');
+                            connectWebSocket();
+                        }, 3000);
+                    }
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('📡 WebSocket hatası:', error);
+                    updateConnectionStatus(false);
+                };
+                
             } catch (error) {
-                alert('❌ Bağlantı hatası: ' + error.message);
+                console.error('WebSocket bağlantı hatası:', error);
+                updateConnectionStatus(false);
             }
         }
 
-        function startProgram() {
-            document.getElementById('status').textContent = 'Çalışıyor';
-            alert('🚀 Program başlatıldı!');
+        // Connection status update
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connectionDot');
+            const status = document.getElementById('connectionStatus');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                status.textContent = 'Bağlı';
+            } else {
+                dot.classList.remove('connected');
+                status.textContent = 'Bağlantı Yok';
+            }
         }
 
-        function stopProgram() {
-            document.getElementById('status').textContent = 'Hazır';
-            alert('⏹ Program durduruldu!');
+        // Backend'den gelen veriyle display güncelle
+        function updateDisplayFromBackend() {
+            // Sıcaklık değerlerini güncelle
+            document.getElementById('currentTemp').textContent = (systemState.temperatures.current || 25).toFixed(1);
+            document.getElementById('targetTemp').textContent = (systemState.temperatures.target || 0).toFixed(0);
+            document.getElementById('temp1').textContent = (systemState.temperatures.tc1 || 25).toFixed(1);
+            document.getElementById('temp2').textContent = (systemState.temperatures.tc2 || 25).toFixed(1);
+            
+            // Güç göstergesi
+            const power = systemState.heaterPower || 0;
+            document.getElementById('powerText').textContent = Math.round(power) + '%';
+            document.getElementById('powerFill').style.width = power + '%';
+            document.getElementById('progPower').textContent = Math.round(power) + '%';
+            
+            // Durum güncellemesi
+            updateSystemStatus();
+            
+            // Timer
+            const hours = Math.floor(systemState.elapsedTime / 3600);
+            const minutes = Math.floor((systemState.elapsedTime % 3600) / 60);
+            const seconds = systemState.elapsedTime % 60;
+            
+            document.getElementById('timer').textContent = 
+                `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            
+            // Progress (basit hesaplama)
+            const totalTime = 25 * 60; // Varsayılan 25 dakika
+            const progress = Math.min(100, (systemState.elapsedTime / totalTime) * 100);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+            
+            // Grafik verisi ekle
+            const now = new Date();
+            temperatureData.push(systemState.temperatures.current || 25);
+            targetData.push(systemState.temperatures.target || 0);
+            timeLabels.push(now);
+            
+            if (temperatureData.length > 100) {
+                temperatureData.shift();
+                targetData.shift();
+                timeLabels.shift();
+            }
+            
+            // Hata gösterimi
+            updateErrorDisplay();
+            
+            // Buton durumları
+            updateButtonStates();
+            
+            // Grafik çiz
+            drawChart();
         }
 
-        // Otomatik test
-        setTimeout(testSystem, 1000);
+        // System status update
+        function updateSystemStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const body = document.body;
+            
+            // Mevcut sınıfları temizle
+            statusDot.className = 'status-dot';
+            body.className = '';
+            
+            if (systemState.emergency) {
+                statusDot.classList.add('error');
+                statusText.textContent = 'ACİL DURDURMA';
+                body.classList.add('emergency');
+            } else if (systemState.doorOpen) {
+                statusDot.classList.add('error');
+                statusText.textContent = 'KAPI AÇIK';
+            } else if (systemState.isRunning) {
+                if (systemState.isPaused) {
+                    statusDot.classList.add('paused');
+                    statusText.textContent = 'DURAKLATILDI';
+                    body.classList.add('paused');
+                } else {
+                    statusDot.classList.add('running');
+                    statusText.textContent = 'ÇALIŞIYOR';
+                    body.classList.add('running');
+                }
+            } else {
+                statusText.textContent = 'HAZIR';
+            }
+        }
+
+        // Error display
+        function updateErrorDisplay() {
+            const errorPanel = document.getElementById('errorPanel');
+            const errorList = document.getElementById('errorList');
+            
+            if (systemState.errors && systemState.errors.length > 0) {
+                errorPanel.classList.add('show');
+                errorList.innerHTML = systemState.errors.map(error => `• ${error}`).join('<br>');
+            } else {
+                errorPanel.classList.remove('show');
+            }
+        }
+
+        // Button states
+        function updateButtonStates() {
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const emergencyBtn = document.getElementById('emergencyBtn');
+            
+            if (systemState.isRunning) {
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                stopBtn.disabled = false;
+                
+                if (systemState.isPaused) {
+                    pauseBtn.innerHTML = '▶ DEVAM';
+                } else {
+                    pauseBtn.innerHTML = '⏸ DURAKLAT';
+                }
+            } else {
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                pauseBtn.innerHTML = '⏸ DURAKLAT';
+            }
+            
+            // Güvenlik kontrolleri
+            if (systemState.emergency || systemState.doorOpen) {
+                startBtn.disabled = true;
+            }
+        }
+
+        // Chart drawing
+        function drawChart() {
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 1;
+            
+            for(let i = 0; i <= 10; i++) {
+                const y = (h / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+                
+                const x = (w / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+            }
+            
+            // Y-axis labels
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '10px Arial';
+            for(let i = 0; i <= 10; i++) {
+                const temp = Math.round((1000 / 10) * (10 - i));
+                const y = (h / 10) * i;
+                ctx.fillText(temp + '°C', 5, y - 5);
+            }
+            
+            // Current temperature line
+            if(temperatureData.length > 1) {
+                ctx.strokeStyle = '#4facfe';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#4facfe';
+                
+                ctx.beginPath();
+                temperatureData.forEach((temp, i) => {
+                    const x = (w / Math.max(temperatureData.length - 1, 1)) * i;
+                    const y = h - ((temp || 0) / 1000) * h;
+                    
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+            
+            // Target temperature line
+            if((systemState.temperatures.target || 0) > 0 && targetData.length > 1) {
+                ctx.strokeStyle = '#f5576c';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 4]);
+                
+                ctx.beginPath();
+                targetData.forEach((temp, i) => {
+                    const x = (w / Math.max(targetData.length - 1, 1)) * i;
+                    const y = h - ((temp || 0) / 1000) * h;
+                    
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        // Display update (fallback)
+        function updateDisplay() {
+            // Fallback update if WebSocket fails
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                // Use local simulation
+                simulateLocalData();
+            }
+        }
+
+        function simulateLocalData() {
+            // Simple local simulation for offline mode
+            const baseTemp = systemState.temperatures.current || 25;
+            const targetTemp = systemState.temperatures.target || 0;
+            
+            if (systemState.isRunning && !systemState.isPaused) {
+                if (targetTemp > baseTemp) {
+                    systemState.temperatures.current = Math.min(targetTemp, baseTemp + 0.5);
+                }
+                systemState.elapsedTime = (systemState.elapsedTime || 0) + 1;
+            }
+            
+            updateDisplayFromBackend();
+        }
+
+        // API calls
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`/api${endpoint}`, options);
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'API hatası');
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('API çağrı hatası:', error);
+                showToast(`❌ ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Control functions
+        async function startProgram() {
+            try {
+                await apiCall('/start', 'POST', { programId: systemState.currentProgram });
+                showToast('🚀 Program başlatıldı!', 'success');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function pauseProgram() {
+            try {
+                const result = await apiCall('/pause', 'POST');
+                const message = result.isPaused ? '⏸ Duraklatıldı' : '▶ Devam ediyor';
+                showToast(message, 'warning');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function stopProgram() {
+            try {
+                await apiCall('/stop', 'POST');
+                showToast('⏹ Program durduruldu!', 'error');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        async function emergencyStop() {
+            try {
+                await apiCall('/emergency', 'POST');
+                showToast('🚨 ACİL DURDURMA!', 'error');
+            } catch (error) {
+                // Error already handled in apiCall
+            }
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize button states
+        updateButtonStates();
+        
+        // Start update loop (fallback)
+        setInterval(updateDisplay, 1000);
+        
+        console.log('🚀 BriLeX Gelişmiş Frontend Hazır!');
     </script>
 </body>
 </html>
