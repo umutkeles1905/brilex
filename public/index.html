@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024, height=600">
+    <title>BriLeX Dental Furnace</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            margin-top: 100px;
+        }
+        h1 { font-size: 48px; margin-bottom: 20px; }
+        .status { font-size: 24px; margin: 20px 0; }
+        .temp { font-size: 64px; color: #4facfe; margin: 30px 0; }
+        button {
+            padding: 20px 40px;
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦷 BriLeX Dental Furnace</h1>
+        <div class="status">Sistem Durumu: <span id="status">Hazır</span></div>
+        <div class="temp" id="temperature">25°C</div>
+        
+        <button onclick="startProgram()">▶ BAŞLAT</button>
+        <button onclick="stopProgram()">⏹ DURDUR</button>
+        <button onclick="testSystem()">🔧 TEST</button>
+    </div>
+
+    <script>
+        async function testSystem() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                document.getElementById('status').textContent = data.message;
+                document.getElementById('temperature').textContent = data.temperature + '°C';
+                alert('✅ Sistem testi başarılı!');
+            } catch (error) {
+                alert('❌ Bağlantı hatası: ' + error.message);
+            }
+        }
+
+        function startProgram() {
+            document.getElementById('status').textContent = 'Çalışıyor';
+            alert('🚀 Program başlatıldı!');
+        }
+
+        function stopProgram() {
+            document.getElementById('status').textContent = 'Hazır';
+            alert('⏹ Program durduruldu!');
+        }
+
+        // Otomatik test
+        setTimeout(testSystem, 1000);
+    </script>
+</body>
+</html>
