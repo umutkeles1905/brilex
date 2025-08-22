@@ -1,0 +1,16 @@
+{
+  "name": "brilex",
+  "version": "1.0.0",
+  "description": "Modern dental furnace control system for Raspberry Pi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "pigpio-client": "^1.0.3"
+  },
+  "author": "BriLeX Systems",
+  "license": "MIT"
+}
